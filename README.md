@@ -9,7 +9,8 @@ GenieIO is a Full Stack React.js/Django app that connects users who want to make
 
 
 <img src="https://github.com/cherkesky/GenieIO/blob/master/assets/genie_home.gif" height="400" width="600">
-
+<img src="https://github.com/cherkesky/GenieIO/blob/master/assets/erd.png" height="400" width="600">
+<img src="https://github.com/cherkesky/GenieIO/blob/master/assets/uml.png" height="400" width="600">
 
 ## Details
 
