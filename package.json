@@ -1,0 +1,32 @@
+{
+  "name": "text2node",
+  "version": "1.0.0",
+  "description": "A sample Express + Twilio project",
+  "main": "src/server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cherkesky/text2node.git"
+  },
+  "keywords": [
+    "nodejs",
+    "twilio",
+    "sms"
+  ],
+  "author": "Guy Cherkesky",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cherkesky/text2node/issues"
+  },
+  "homepage": "https://github.com/cherkesky/text2node#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "mongoose": "^5.9.2",
+    "node-fetch": "^2.6.0",
+    "nodemon": "^2.0.2",
+    "twilio": "^3.39.5"
+  }
+}
