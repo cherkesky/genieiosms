@@ -27,7 +27,6 @@ const newUser = {
   "cid": ""
 }
 
-
 //mongoose connect
 mongoose.connect(`mongodb+srv://cherkesky:${mymongopass}@text2node-eywb4.mongodb.net/test?retryWrites=true&w=majority`, {
   useNewUrlParser: true,
@@ -48,7 +47,6 @@ app.get('/test', function (req, res) {
 
 // the SMS main route
 app.post('/sms', (req, res) => {
-  // if the t
   if (state.isRegistering == true) {
     if (state.lastCommand == "register") {
       console.log(`First Name ${req.body.Body}`)
