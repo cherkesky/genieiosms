@@ -5,7 +5,7 @@
 
 
 
-GenieIO is a Full Stack React.js/Django app that connects users who want to make a wish (ex: I want to pass calculus) to users that think they can grant their wishes (ex: I’m a calculus instructor. I think I can help you!). There is a dedicated section for the Wishers to send their wishes and a section for Granters to search for a wish to grant. If a Wisher gets a Grant request they can reject or approve the request. If they choose to approve the request, their contact info will be shared with the Granter.The home page shows a word cloud made from the wish’s keywords. The wishes are processed with NLTK to remove all the stop words and leave only the important keywords for the word cloud. GenieIO also allows users to text wishes from their phones.
+GenieIO is a Full Stack React.js/Django app that connects users who want to make a wish (ex: I want to pass calculus) to users that think they can grant their wishes (ex: I’m a calculus instructor. I think I can help you!). There is a dedicated section for the Wishers to send their wishes and a section for Granters to search for a wish to grant. If a Wisher gets a Grant request they can reject or approve the request. If they choose to approve the request, the Granter contact info will be shared with the Wisher. The home page shows a word cloud made from the wish’s keywords. The wishes are processed with NLTK to remove all the stop words and leave only the important keywords for the word cloud. GenieIO also allows users to text wishes from their phones.
 
 
 <img src="https://github.com/cherkesky/GenieIO/blob/master/assets/genie_home.gif" height="400" width="600">
