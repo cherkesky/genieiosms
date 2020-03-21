@@ -1,6 +1,6 @@
 
-const greeting = String.raw `
-  _____ _____ _____ _____    _____ _____ _______ 
+const menu = String.raw `
+_____ _____ _____ _____    _____ _____ _______ 
 |      |    |    __|    __|
 |  |   |    |__    |__    |
 |_|_____|_____|____|
@@ -10,10 +10,8 @@ Guy Cherkesky Cohort 36
 
 Please choose from the following commands:
 
-- Register
-- Login
-`
+- Wish`
 
-module.exports = greeting 
+module.exports = menu 
 
 
