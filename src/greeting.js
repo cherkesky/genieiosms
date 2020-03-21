@@ -9,6 +9,7 @@ Guy Cherkesky Cohort 36
 -=[Welcome to GenieIO]=-
 
 Please choose from the following commands:
+
 - Register
 - Login
 `

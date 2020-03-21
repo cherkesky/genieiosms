@@ -9,9 +9,8 @@ Guy Cherkesky Cohort 36
 -=[Welcome to GenieIO]=-
 
 Please choose from the following commands:
-- Wish
-- Logout
-`
+
+- Wish`
 
 module.exports = menu 
 

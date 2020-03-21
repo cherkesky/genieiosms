@@ -16,6 +16,7 @@ const menu = require('./menu')
 
 const state = {
   isRegistering: false,
+  returnedUser: false,
   isAuthenticating: false,
   isAuth: false,
   cid: 0,
@@ -41,6 +42,7 @@ mongoose.connect(`mongodb+srv://cherkesky:${mymongopass}@text2node-eywb4.mongodb
   useUnifiedTopology: true
 })
 
+
 //initializing express
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -55,8 +57,7 @@ app.get('/test', function (req, res) {
 
 // the SMS main route
 app.post('/sms', (req, res) => {
-
-  if (state.isAuth === false){ // Login & Register
+  if (state.isAuth === false) { // Login & Register
     if (state.isRegistering === true) {
       ///////////////////////////////////////////////////////////////
       //                          Register                         //
@@ -102,13 +103,13 @@ app.post('/sms', (req, res) => {
         newUser.password = req.body.Body
         state.isRegistering = false
         state.isAuth = true
-  
+
         state.lastCommand = "password"
-  
+
         newUser.username = parseInt(req.body.From.split("+")[1])
-  
+
         console.log(newUser)
-  
+
         fetch(`http://localhost:8000/register/`, {
           method: "POST",
           headers: {
@@ -123,7 +124,7 @@ app.post('/sms', (req, res) => {
               cid: parseInt(req.body.From.split("+1")[1]),
               token: jsonfiedData.token
             })
-  
+
             userconnection.save()
               .then(result => {
                 console.log("Mongoose Save: ", result)
@@ -134,11 +135,11 @@ app.post('/sms', (req, res) => {
                and your password ends with ****** ${newUser.password.slice(-4)}`)
             res.writeHead(200, { 'Content-Type': 'text/xml' });
             res.end(twiml.toString())
-  
+
             state.isAuth = true
             state.token = jsonfiedData.token
             state.cid = parseInt(req.body.From.split("+1")[1])
-  
+
             twiml.message(menu)
             res.writeHead(200, { 'Content-Type': 'text/xml' });
             res.end(twiml.toString())
@@ -149,23 +150,23 @@ app.post('/sms', (req, res) => {
       ///////////////////////////////////////////////////////////////
       //                          Login                            //
       ///////////////////////////////////////////////////////////////
-  
+
       if (state.lastCommand === 'login') {
         authUser.username = req.body.Body
         console.log(`Username ${req.body.Body}`)
         const twiml = new MessagingResponse();
-  
+
         twiml.message("What is your password?")
         res.writeHead(200, { 'Content-Type': 'text/xml' });
         res.end(twiml.toString())
-  
+
         state.lastCommand = "login-user"
       } else if (state.lastCommand === 'login-user') {
         authUser.password = req.body.Body
         console.log(`Passwords ${req.body.Body}`)
-  
+
         console.log(authUser)
-  
+
         fetch(`http://localhost:8000/login/`, {
           method: "POST",
           headers: {
@@ -180,23 +181,23 @@ app.post('/sms', (req, res) => {
             state.isAuth = true
             state.token = jsonfiedData.token
             state.cid = parseInt(req.body.From.split("+1")[1])
-  
+
             console.log(state)
-  
+
           })
           .catch(err => console.log("ERROR", err))
 
-          const twiml = new MessagingResponse();
-          twiml.message(menu)
-          res.writeHead(200, { 'Content-Type': 'text/xml' });
-          res.end(twiml.toString())
+        const twiml = new MessagingResponse();
+        twiml.message(menu)
+        res.writeHead(200, { 'Content-Type': 'text/xml' });
+        res.end(twiml.toString())
       }
     }
     else if (req.body.Body === "register" || req.body.Body === "Register" || req.body.Body === "Register " || req.body.Body === "register ") { // Register
-  
+      
       state.isRegistering = true
       state.lastCommand = "register"
-  
+
       const twiml = new MessagingResponse();
       twiml.message("Hi there stranger! Let's get to know you. What is your first name?")
       res.writeHead(200, { 'Content-Type': 'text/xml' });
@@ -214,15 +215,15 @@ app.post('/sms', (req, res) => {
     else if (req.body.Body === "start" || req.body.Body === "Start" || req.body.Body === "start " || req.body.Body === "Start ") { // Start
       console.log(req.body.Body)
       lastCommand = "start"
-  
+
       const twiml = new MessagingResponse();
       twiml.message(greeting)
-  
+
       res.writeHead(200, { 'Content-Type': 'text/xml' });
       res.end(twiml.toString())
     }
-  } else if (state.isAuth === true){ // Wish  
-    
+  } else if (state.isAuth === true) { // Wish  
+
 
     console.log("WISH BLOCK")
 
@@ -261,17 +262,23 @@ http.createServer(app).listen(1337, () => {
 
 
 
+// Userconnection.findOne({ cid: parseInt(req.body.From.split("+")[1]) })
+// .exec()
+// .then(doc => {
+//   state.token = doc.token
+//   state.cid = doc.cid
+//   state.isAuth = true
+//   state.returnedUser = true
+//   state.lastCommand = 'auto-auth'
+//   console.log(state)
+// })
+// .catch(err => console.log(err))
 
-  // Userconnection.findOne({cid: parseInt(req.body.From.split("+")[1])})
-  // .exec()
-  // .then(doc=>{
-  //   state.token = doc.token
-  //   state.cid = doc.cid
-  //   state.isAuth = true
-  //   state.lastCommand = 'login'
-  //   console.log(state)
-  // })
-  // .catch(err => console.log(err))
+
+
+
+
+
 
 
 
