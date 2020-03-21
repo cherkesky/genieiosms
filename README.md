@@ -31,9 +31,13 @@ Full CRUD functionality
 
 Backend (Python, Django):
 In the project directory, you can run:
+### `python -m venv env`
+### `source env/bin/activate`
+### `pip install -r requirements.txt`
 ### `python manage.py makemigrations genieioapp`
 ### `python manage.py migrate`
 ### `python manage.py runserver`
+
 
 Frontend (Javscript, React)
 In the project directory, you can run:
