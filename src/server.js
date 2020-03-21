@@ -36,6 +36,12 @@ const authUser = {
   "password": "",
 }
 
+const newWish = {
+"wish_body": "",
+"category": 1,
+"location": 1
+}
+
 //mongoose connect
 mongoose.connect(`mongodb+srv://cherkesky:${mymongopass}@text2node-eywb4.mongodb.net/test?retryWrites=true&w=majority`, {
   useNewUrlParser: true,
@@ -223,11 +229,29 @@ app.post('/sms', (req, res) => {
       res.end(twiml.toString())
     }
   } else if (state.isAuth === true) { // Wish  
+     if (req.body.Body === "wish" || req.body.Body === "Wish" || req.body.Body === "wish " || req.body.Body === "Wish ") { // Login
+      state.lastCommand = "wish"
+      const twiml = new MessagingResponse();
+      twiml.message("What is your wish?")
+      res.writeHead(200, { 'Content-Type': 'text/xml' });
+      res.end(twiml.toString())
+    } else {
+      newWish.wish_body= req.body.Body
 
+      console.log("WISH BLOCK", newWish)
 
-    console.log("WISH BLOCK")
+      fetch(`http://localhost:8000/wishes`, {
 
-
+         method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Authorization": `Token ${state.token}`
+        },
+        body: JSON.stringify(newWish)
+      }).then(data => data.json())
+        .then(jsonfiedData=> console.log(jsonfiedData))
+    }
 
 
   }
@@ -255,11 +279,20 @@ http.createServer(app).listen(1337, () => {
 
 
 
+
+
+
+
+
+
+
+
+
+
 // const twiml = new MessagingResponse();
 //       twiml.message(menu)
 //       res.writeHead(200, { 'Content-Type': 'text/xml' });
 //       res.end(twiml.toString())
-
 
 
 // Userconnection.findOne({ cid: parseInt(req.body.From.split("+")[1]) })
@@ -273,15 +306,6 @@ http.createServer(app).listen(1337, () => {
 //   console.log(state)
 // })
 // .catch(err => console.log(err))
-
-
-
-
-
-
-
-
-
 
 
 // running from terminal
