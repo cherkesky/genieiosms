@@ -93,16 +93,26 @@ app.post('/sms', (req, res) => {
         twiml.message("What is your phone number?")
         res.writeHead(200, { 'Content-Type': 'text/xml' });
         res.end(twiml.toString())
-        state.lastCommand = "phone"
-      }
-      else if (state.lastCommand == "phone") {
+        state.lastCommand = "email"
+      }  
+       else if (state.lastCommand == "email") {
         console.log(`Phone ${req.body.Body}`)
+        newUser.email = req.body.Body
+        const twiml = new MessagingResponse();
+        twiml.message("What is your username?")
+        res.writeHead(200, { 'Content-Type': 'text/xml' });
+        res.end(twiml.toString())
+        state.lastCommand = "user"
+      }
+      else if (state.lastCommand == "user") {
+        console.log(`Username ${req.body.Body}`)
         newUser.cid = req.body.Body
+        newUser.username = req.body.Body
         const twiml = new MessagingResponse();
         twiml.message("What is your password?")
         res.writeHead(200, { 'Content-Type': 'text/xml' });
         res.end(twiml.toString())
-        state.lastCommand = "email"
+        state.lastCommand = "password"
       }
       else if (state.lastCommand == "email") {
         console.log(`Password ${req.body.Body}`)
@@ -112,7 +122,7 @@ app.post('/sms', (req, res) => {
 
         state.lastCommand = "password"
 
-        newUser.username = parseInt(req.body.From.split("+")[1])
+        // newUser.username = parseInt(req.body.From.split("+")[1])
 
         console.log(newUser)
 
@@ -189,7 +199,17 @@ app.post('/sms', (req, res) => {
             state.cid = parseInt(req.body.From.split("+1")[1])
 
             console.log(state)
+            
+            const userconnection = new Userconnection({
+              _id: new mongoose.Types.ObjectId,
+              cid: parseInt(req.body.From.split("+1")[1]),
+              token: jsonfiedData.token
+            })
 
+            userconnection.save()
+              .then(result => {
+                console.log("Mongoose Save: ", result)
+              }).catch(err => console.log(err))
           })
           .catch(err => console.log("ERROR", err))
 
@@ -222,7 +242,7 @@ app.post('/sms', (req, res) => {
       console.log(req.body.Body)
       lastCommand = "start"
 
-      Userconnection.findOne({ cid: parseInt(req.body.From.split("+")[1]) })
+      Userconnection.findOne({ cid: parseInt(req.body.From.split("+1")[1]) })
         .exec()
         .then(doc => {
           state.token = doc.token
@@ -231,8 +251,19 @@ app.post('/sms', (req, res) => {
           state.returnedUser = true
           state.lastCommand = 'auto-auth'
           console.log(state)
+
+          const twiml = new MessagingResponse();
+          twiml.message(menu)
+          res.writeHead(200, { 'Content-Type': 'text/xml' });
+          res.end(twiml.toString())
         })
-        .catch(err => console.log(err))
+        .catch(err => {
+          const twiml = new MessagingResponse();
+          twiml.message(greeting)
+          res.writeHead(200, { 'Content-Type': 'text/xml' });
+          res.end(twiml.toString())
+          
+          console.log(err)})
 
         if (state.returnedUser==='false'){
             const twiml = new MessagingResponse();
@@ -240,7 +271,7 @@ app.post('/sms', (req, res) => {
 
             res.writeHead(200, { 'Content-Type': 'text/xml' });
             res.end(twiml.toString())
-        } else {
+        } else if (state.returnedUser==='true') {
             const twiml = new MessagingResponse();
             twiml.message(menu)
 
