@@ -19,6 +19,8 @@ const state = {
   returnedUser: false,
   isAuthenticating: false,
   isAuth: false,
+  state:"",
+  location: 0,
   cid: 0,
   token: '',
   lastCommand: ""
@@ -34,6 +36,12 @@ const newUser = {
 const authUser = {
   "username": "",
   "password": "",
+}
+
+const newWish = {
+  "wish_body": "",
+  "category": 1,
+  "location": 0
 }
 
 //mongoose connect
@@ -87,16 +95,26 @@ app.post('/sms', (req, res) => {
         twiml.message("What is your phone number?")
         res.writeHead(200, { 'Content-Type': 'text/xml' });
         res.end(twiml.toString())
-        state.lastCommand = "phone"
+        state.lastCommand = "email"
       }
-      else if (state.lastCommand == "phone") {
+      else if (state.lastCommand == "email") {
         console.log(`Phone ${req.body.Body}`)
+        newUser.email = req.body.Body
+        const twiml = new MessagingResponse();
+        twiml.message("What is your username?")
+        res.writeHead(200, { 'Content-Type': 'text/xml' });
+        res.end(twiml.toString())
+        state.lastCommand = "user"
+      }
+      else if (state.lastCommand == "user") {
+        console.log(`Username ${req.body.Body}`)
         newUser.cid = req.body.Body
+        newUser.username = req.body.Body
         const twiml = new MessagingResponse();
         twiml.message("What is your password?")
         res.writeHead(200, { 'Content-Type': 'text/xml' });
         res.end(twiml.toString())
-        state.lastCommand = "email"
+        state.lastCommand = "password"
       }
       else if (state.lastCommand == "email") {
         console.log(`Password ${req.body.Body}`)
@@ -106,7 +124,7 @@ app.post('/sms', (req, res) => {
 
         state.lastCommand = "password"
 
-        newUser.username = parseInt(req.body.From.split("+")[1])
+        // newUser.username = parseInt(req.body.From.split("+")[1])
 
         console.log(newUser)
 
@@ -184,6 +202,16 @@ app.post('/sms', (req, res) => {
 
             console.log(state)
 
+            const userconnection = new Userconnection({
+              _id: new mongoose.Types.ObjectId,
+              cid: parseInt(req.body.From.split("+1")[1]),
+              token: jsonfiedData.token
+            })
+
+            userconnection.save()
+              .then(result => {
+                console.log("Mongoose Save: ", result)
+              }).catch(err => console.log(err))
           })
           .catch(err => console.log("ERROR", err))
 
@@ -194,7 +222,7 @@ app.post('/sms', (req, res) => {
       }
     }
     else if (req.body.Body === "register" || req.body.Body === "Register" || req.body.Body === "Register " || req.body.Body === "register ") { // Register
-      
+
       state.isRegistering = true
       state.lastCommand = "register"
 
@@ -213,23 +241,95 @@ app.post('/sms', (req, res) => {
       console.log("Login")
     }
     else if (req.body.Body === "start" || req.body.Body === "Start" || req.body.Body === "start " || req.body.Body === "Start ") { // Start
-      console.log(req.body.Body)
+      state.state = req.body.FromState
+      console.log("User Location:", state.state)
+
       lastCommand = "start"
 
-      const twiml = new MessagingResponse();
-      twiml.message(greeting)
+      Userconnection.findOne({ cid: parseInt(req.body.From.split("+1")[1]) })
+        .exec()
+        .then(doc => {
+          state.token = doc.token
+          state.cid = doc.cid
+          state.isAuth = true
+          state.returnedUser = true
+          state.lastCommand = 'auto-auth'
+          console.log(state)
 
-      res.writeHead(200, { 'Content-Type': 'text/xml' });
-      res.end(twiml.toString())
+          fetch(`http://localhost:8000/locations?get_state=${state.state}`, {
+            "method": "GET",
+            "headers": {
+              "Accept": "application/json",
+              "Authorization": `Token ${state.token}`
+            }
+          }).then(result => result.json())
+          .then((result) => {
+              state.location=result[0].id 
+              console.log(state)
+          })
+
+
+          const twiml = new MessagingResponse();
+          twiml.message(menu)
+          res.writeHead(200, { 'Content-Type': 'text/xml' });
+          res.end(twiml.toString())
+        })
+        .catch(err => {
+          const twiml = new MessagingResponse();
+          twiml.message(greeting)
+          res.writeHead(200, { 'Content-Type': 'text/xml' });
+          res.end(twiml.toString())
+
+          console.log(err)
+        })
+
+      if (state.returnedUser === 'false') {
+        const twiml = new MessagingResponse();
+        twiml.message(greeting)
+
+        res.writeHead(200, { 'Content-Type': 'text/xml' });
+        res.end(twiml.toString())
+      } else if (state.returnedUser === 'true') {
+        const twiml = new MessagingResponse();
+        twiml.message(menu)
+
+        res.writeHead(200, { 'Content-Type': 'text/xml' });
+        res.end(twiml.toString())
+      }
+
     }
   } else if (state.isAuth === true) { // Wish  
+    if (req.body.Body === "wish" || req.body.Body === "Wish" || req.body.Body === "wish " || req.body.Body === "Wish ") { // Login
+      state.lastCommand = "wish"
+      const twiml = new MessagingResponse();
+      twiml.message("What is your wish?")
+      res.writeHead(200, { 'Content-Type': 'text/xml' });
+      res.end(twiml.toString())
+    } else if (state.lastCommand === "wish") {
+      newWish.wish_body = req.body.Body
+      newWish.location = state.location
 
+      console.log("WISH BLOCK", newWish)
 
-    console.log("WISH BLOCK")
+      fetch(`http://localhost:8000/wishes`, {
 
-
-
-
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "Authorization": `Token ${state.token}`
+        },
+        body: JSON.stringify(newWish)
+      }).then(data => data.json())
+        .then(jsonfiedData => {
+          console.log(jsonfiedData)
+          state.lastCommand = "wish-sent"
+          const twiml = new MessagingResponse();
+          twiml.message("Wish sent succesfully! text Wish to send another one!")
+          res.writeHead(200, { 'Content-Type': 'text/xml' });
+          res.end(twiml.toString())
+        })
+    }
   }
   else {
     console.log("Unknown Command")
@@ -255,11 +355,20 @@ http.createServer(app).listen(1337, () => {
 
 
 
+
+
+
+
+
+
+
+
+
+
 // const twiml = new MessagingResponse();
 //       twiml.message(menu)
 //       res.writeHead(200, { 'Content-Type': 'text/xml' });
 //       res.end(twiml.toString())
-
 
 
 // Userconnection.findOne({ cid: parseInt(req.body.From.split("+")[1]) })
@@ -273,15 +382,6 @@ http.createServer(app).listen(1337, () => {
 //   console.log(state)
 // })
 // .catch(err => console.log(err))
-
-
-
-
-
-
-
-
-
 
 
 // running from terminal
