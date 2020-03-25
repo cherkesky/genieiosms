@@ -19,7 +19,7 @@ const state = {
   returnedUser: false,
   isAuthenticating: false,
   isAuth: false,
-  state:"",
+  state: "",
   location: 0,
   cid: 0,
   token: '',
@@ -263,10 +263,10 @@ app.post('/sms', (req, res) => {
               "Authorization": `Token ${state.token}`
             }
           }).then(result => result.json())
-          .then((result) => {
-              state.location=result[0].id 
+            .then((result) => {
+              state.location = result[0].id
               console.log(state)
-          })
+            })
 
 
           const twiml = new MessagingResponse();
@@ -329,6 +329,15 @@ app.post('/sms', (req, res) => {
           res.writeHead(200, { 'Content-Type': 'text/xml' });
           res.end(twiml.toString())
         })
+    } else if (req.body.Body === "logout" || req.body.Body === "Logout" || req.body.Body === "logout " || req.body.Body === "Logout ") {
+      Userconnection.deleteOne({ cid: parseInt(req.body.From.split("+1")[1]) })
+      .exec()
+      console.log("LOGGED OUT!")
+      state.isAuth=false
+      const twiml = new MessagingResponse();
+      twiml.message(greeting);
+      res.writeHead(200, { 'Content-Type': 'text/xml' });
+      res.end(twiml.toString());
     }
   }
   else {
