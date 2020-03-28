@@ -1,6 +1,6 @@
 
 const menu = String.raw `
-_____ _____ _____ _____    _____ _____ _______ 
+_____ _____ _____ __
 |      |    |    __|    __|
 |  |   |    |__    |__    |
 |_|_____|_____|____|
@@ -10,7 +10,9 @@ Guy Cherkesky Cohort 36
 
 Please choose from the following commands:
 
-- Wish`
+- Wish
+- Logout
+`
 
 module.exports = menu 
 
