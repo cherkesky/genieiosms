@@ -31,17 +31,23 @@ Full CRUD functionality
 
 Backend (Python, Django):
 In the project directory, you can run:
+(Run all commands with python3 if it doesn't have a python alias on your machine)
+
 ### `python -m venv env`
 ### `source env/bin/activate`
 ### `pip install -r requirements.txt`
 ### `python manage.py makemigrations genieioapp`
 ### `python manage.py migrate`
+### `python manage.py loaddata genieioapp/fixtures/fixtures.json`
 ### `python manage.py runserver`
 
 
 Frontend (Javscript, React)
 In the project directory, you can run:
+### `npm install`
 ### `npm start`
+### `Rename src/apikeysExample.js to src/apikeys.js`
+### `Add a Google Geocoder API Key to src/apikeys.js`
 
 SMS text server (Node.JS, Express)
 In the project directory, you can run:
